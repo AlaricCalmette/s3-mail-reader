@@ -1,10 +1,10 @@
 import { simpleParser } from 'mailparser';
-import * as fs from 'fs';
-import * as express from 'express';
 import * as http from 'http';
 import * as path from 'path';
 import * as body from 'body-parser';
 import * as AWS from 'aws-sdk';
+
+import express from 'express';
 
 AWS.config.update({region: 'eu-west-3'});
 
@@ -19,42 +19,45 @@ app.get('/app/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-
-app.get('/mail/:id', async (req: any, res) => {
-    const id = req.params.id;
-
-    const mailOptions = {
-        Bucket: 'alaric.eu-mails',
-        Key: `mail-received/${id}`,
-        ResponseContentType: 'text/plain'
-    };
-    await s3.getObject(mailOptions, async (err, data) => {
-        if (err) console.log(err, err.stack); // an error occurred
-        else {
-            const mail = await simpleParser(data.Body.toString());
-            res.json(mail);
-        }
-    });
-
-});
-
-app.get('/mail/', (req, res) => {
+app.get('/mail/', async (req, res) => {
     const bucketParams = {
         Bucket: 'alaric.eu-mails',
         Prefix: 'mail-received'
     };
-    s3.listObjects(bucketParams, (err, data) => {
-        if (err) {
-          console.log("Error", err);
-        } else {
-            const mailNames = data.Contents.map((content) => {
-                return content.Key.split('/')[1];
-            });
 
-            res.json(mailNames);
-        }
-    });
+    const mailNames: any = await s3.listObjects(bucketParams).promise();
+    const mails = [];
+    for (const mailObject of mailNames.Contents) {
+        const mailOptions = {
+            Bucket: 'alaric.eu-mails',
+            Key: mailObject.Key,
+            ResponseContentType: 'text/plain'
+        };
+        const unparsedMail = await s3.getObject(mailOptions).promise();
+        const parsedMail = await simpleParser(unparsedMail.Body.toString());
+        mails.push({
+            mailKey: mailObject.Key,
+            parsed: parsedMail
+        });
+    }
+    res.json(mails);
 });
+
+app.get('/delete/:messageKey', async (req, res) => {
+    const messageKey = req.params.messageKey;
+    const mailOptions = {
+        Bucket: 'alaric.eu-mails',
+        Key: `mail-received/${messageKey}`,
+    };
+    try {
+        await s3.deleteObject(mailOptions).promise();
+        res.json(200);
+    }
+    catch (e) {
+        console.log(e);
+        res.json(400);
+    }
+})
 
 console.log('listening on 1234');
 server.listen(1234);

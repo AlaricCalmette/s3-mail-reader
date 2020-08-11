@@ -2,44 +2,42 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import { ParsedMail } from 'mailparser';
 import MailList from './components/MailList';
+import { toaster } from 'evergreen-ui';
 
 const App = () => {
 
-    const [mails, setMails] = useState<any>([]);
+    const [mails, setMails] = useState<{ parsed: ParsedMail; mailKey: string}[]>([]);
     const [mail, setMail] = useState<ParsedMail>();
 
-    useEffect(() => {
-        const fetchMails = async () => {
-            const response = await fetch('/mail/');
-            const mailsReceived = await response.json();
-            console.log(mailsReceived);
+    const fetchMails = async () => {
+        const response = await fetch('/mail/');
+        const mailsReceived = await response.json();
 
-            setMails(mailsReceived);
-        };
+        setMails(mailsReceived);
+    };
+
+    const deleteMail = async (mailKey: string) => {
+        const response = await fetch(`/delete/${mailKey}`);
+        if (response.ok) {
+            toaster.success('Mail exterminé!');
+            const remainingMails = [...mails];
+            remainingMails.splice(mails.findIndex((mail) => mail.mailKey === `mail-received/${mailKey}`), 1);
+            setMails(remainingMails);
+        }
+        else {
+            toaster.success('Le mail a resisté à l\'extermination!');
+        }
+        await fetchMails();
+    }
+
+    useEffect(() => {
         fetchMails();
     }, []);
 
-    const fetchMail = async (mailSelected: string) => {
-        const response = await fetch(`/mail/${mailSelected}`);
-        console.log(response);
-        const mailParsed = await response.json();
-        setMail(mailParsed);
-    }
-
     return (
         <div className="App">
-            <MailList mails={mails} fetchMail={fetchMail} />
-
-            <div>
-                {mail &&
-                    <>
-                        From: <div dangerouslySetInnerHTML={{ __html: mail?.from?.html || '' }} />
-                        To: <div dangerouslySetInnerHTML={{ __html: mail?.to?.html || '' }} />
-                        At: <div>{mail?.date}</div>
-                        <div dangerouslySetInnerHTML={{__html: mail.html || ''}}></div>
-                    </>
-                }
-            </div>
+            <MailList mails={mails} fetchMail={setMail} deleteMail={deleteMail} />
+            { mail && <div style={{width: '20vw'}} dangerouslySetInnerHTML={{__html: mail.html || ''}}></div> }
         </div>
     );
 }
