@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import { ParsedMail } from 'mailparser';
 import MailList from './components/MailList';
+import MailScreen from './components/MailScreen';
 import { toaster } from 'evergreen-ui';
 
 const App = () => {
@@ -37,7 +38,7 @@ const App = () => {
     return (
         <div className="App">
             <MailList mails={mails} fetchMail={setMail} deleteMail={deleteMail} />
-            { mail && <div style={{width: '20vw'}} dangerouslySetInnerHTML={{__html: mail.html || ''}}></div> }
+            { mail && <MailScreen mail={mail} /> }
         </div>
     );
 }

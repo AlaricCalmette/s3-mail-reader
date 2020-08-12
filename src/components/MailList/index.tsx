@@ -25,6 +25,12 @@ const MailList = (props: OwnProps) => {
         props.deleteMail(mailKey);
     }
 
+    if (props.mails) {
+        props.mails.forEach((mail) => {
+            console.log(mail.parsed);
+        })
+    }
+
     return (
         <MailListTable>
             <Table.Head>
