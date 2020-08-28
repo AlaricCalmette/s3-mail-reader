@@ -7,11 +7,11 @@ import { toaster } from 'evergreen-ui';
 
 const App = () => {
 
-    const [mails, setMails] = useState<{ parsed: ParsedMail; mailKey: string}[]>([]);
+    const [mails, setMails] = useState<{ parsed: ParsedMail; mailKey: string }[]>([]);
     const [mail, setMail] = useState<ParsedMail>();
 
     const fetchMails = async () => {
-        const response = await fetch('/mail/');
+        const response = await fetch('/mail/', { cache: 'force-cache' });
         const mailsReceived = await response.json();
 
         setMails(mailsReceived);
@@ -38,9 +38,9 @@ const App = () => {
     return (
         <div className="App">
             <MailList mails={mails} fetchMail={setMail} deleteMail={deleteMail} />
-            { mail && <MailScreen mail={mail} /> }
+            {mail && <MailScreen mail={mail} />}
         </div>
     );
 }
 
-    export default App;
+export default App;

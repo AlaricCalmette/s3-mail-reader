@@ -6,6 +6,10 @@ import * as AWS from 'aws-sdk';
 
 import express from 'express';
 
+if (process.env.NODE_ENV === 'local') {
+    AWS.config.loadFromPath('./awsconfig.json');
+}
+
 AWS.config.update({region: 'eu-west-3'});
 
 const app = express();
