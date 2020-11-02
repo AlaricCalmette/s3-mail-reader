@@ -11,7 +11,7 @@ const App = () => {
     const [mail, setMail] = useState<ParsedMail>();
 
     const fetchMails = async () => {
-        const response = await fetch('/mail/', { cache: 'force-cache' });
+        const response = await fetch('/mail/', { cache: 'no-cache' });
         const mailsReceived = await response.json();
 
         setMails(mailsReceived);

@@ -53,6 +53,12 @@ const MailList = (props: OwnProps) => {
                     else {
                         assignArray('unknown', mail, acc);
                     }
+                    break;
+                case 'to':
+                    if ((mail.parsed.to?.value[0].address)) {
+                        assignArray(mail.parsed.to?.value[0].address, mail, acc);
+                    }
+                    break;
             }
             return acc;
         }, {} as { [key: string]: { parsed: ParsedMail, mailKey: string }[] });
