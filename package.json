@@ -16,18 +16,18 @@
     "@types/react": "^16.9.46",
     "@types/react-dom": "^16.9.0",
     "@types/styled-components": "^5.1.2",
-    "aws-sdk": "^2.730.0",
-    "body-parser": "^1.19.0",
-    "evergreen-ui": "^5.0.4",
-    "express": "^4.17.1",
-    "mailparser": "^3.0.1",
+    "aws-sdk": "^2.814.0",
+    "body-parser": "^1.19.2",
+    "evergreen-ui": "^6.2.0",
+    "express": "^4.17.3",
+    "mailparser": "^3.3.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-is": "^16.13.1",
-    "react-scripts": "3.4.4",
+    "react-scripts": "5.0.0",
     "styled-components": "^5.1.1",
     "typescript": "~3.9.7",
-    "snyk": "^1.372.0"
+    "@snyk/protect": "latest"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -36,7 +36,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "snyk-protect": "snyk protect"
+    "snyk-protect": "snyk-protect",
+    "prepare": "yarn run snyk-protect"
   },
   "eslintConfig": {
     "extends": "react-app"
